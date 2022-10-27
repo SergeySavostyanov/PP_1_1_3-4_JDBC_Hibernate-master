@@ -1,11 +1,7 @@
 package jm.task.core.jdbc.util;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -29,7 +25,6 @@ public class Util {
             prop.setProperty("hibernate.default_schema","mydbstest");
             prop.setProperty("hibernate.hibernate.format_sql","true");
             prop.setProperty("hibernate.hibernate.current_session_context_class", "thread");
-
             prop.setProperty("hibernate.hbm2ddl.auto", "create");
 
             concreteSessionFactory = new org.hibernate.cfg.Configuration()

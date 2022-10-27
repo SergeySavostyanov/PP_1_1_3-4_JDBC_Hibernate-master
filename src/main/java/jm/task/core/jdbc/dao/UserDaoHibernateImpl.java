@@ -21,9 +21,11 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void createUsersTable() {
         Session session = Util.getSessionFactory().openSession();
+        Transaction transaction = null;
         //этапы выполнения запроса
+
         try {
-            Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
             Query query = session.createSQLQuery("CREATE TABLE IF NOT EXISTS `mydbstest`.`users` (\n" +
                     "  `id` INT NOT NULL AUTO_INCREMENT,\n" +
                     "  `name` VARCHAR(45) NOT NULL,\n" +
@@ -32,7 +34,9 @@ public class UserDaoHibernateImpl implements UserDao {
                     "  PRIMARY KEY (`id`));");
             query.executeUpdate();
             transaction.commit();
+            
         } catch (Exception e) {
+            transaction.rollback();
             System.out.println("Ошибка при создании таблицы users");
         } finally {
             session.close();
@@ -44,9 +48,10 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void dropUsersTable() {
         Session session = Util.getSessionFactory().openSession();
+        Transaction transaction = null;
 
         try {
-            Transaction transaction = session.beginTransaction();
+            transaction = session.beginTransaction();
 
             //этапы выполнения запроса
             Query query = session.createSQLQuery("DROP TABLE IF EXISTS users");
@@ -56,6 +61,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
 
         } catch (HibernateException e) {
+            transaction.rollback();
             System.out.println("Ошибка при удалении таблицы users  из БД");
         } finally {
             session.close();
@@ -65,12 +71,14 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         Session session = Util.getSessionFactory().openSession();
+        Transaction transaction = null;
         try {
-            session.beginTransaction();  //отрытие транзации
+            transaction=session.beginTransaction();  //отрытие транзации
             User user = new User(name, lastName, (byte) age);
             session.save(user);                 // фиксация изменений
             session.getTransaction().commit();  // сохранение изменений(транзакция завершается)
         } catch (HibernateException e) {
+            transaction.rollback();
             System.out.println("Ошибка при добавлении пользователя в таблицу");
         } finally {
             session.close();                    //закрытие сессию
@@ -82,11 +90,13 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void removeUserById(long id) {
         Session session = Util.getSessionFactory().openSession();
+        Transaction transaction = null;
         try {
-            Transaction transaction =session.beginTransaction();                //отрытие транзации
+            transaction =session.beginTransaction();                //отрытие транзации
             session.delete(session.get(User.class, id));// фиксация изменений
             transaction.commit();         // сохранение изменений(транзакция завершается)
         } catch (HibernateException e) {
+            transaction.rollback();
             System.out.println("Не удалось удалить пользователь с id=" + id);
         } finally {
             session.close();                   //закрытие сессию
@@ -104,7 +114,6 @@ public class UserDaoHibernateImpl implements UserDao {
             Root<User> root = cq.from(User.class);//выбор основной таблицы (from в sql)
 
             cq.select(root);//получение ввсех обьектов
-
             //этапы выполнения запроса
             Query query = session.createQuery(cq);
             users = query.getResultList();
@@ -121,12 +130,14 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         Session session = Util.getSessionFactory().openSession();
+        Transaction transaction = null;
         try {
-            Transaction transaction =session.beginTransaction();
+            transaction =session.beginTransaction();
             Query query=session.createSQLQuery("TRUNCATE TABLE users");
             query.executeUpdate();
             transaction.commit();
         } catch (HibernateException e) {
+            transaction.rollback();
             System.out.println("Не удалось очистить таблицу");
         }
         finally {
