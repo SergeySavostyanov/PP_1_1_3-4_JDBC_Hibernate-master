@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        Util.getSessionFactory();
+        Util.getSessionFactory().openSession();
         UserService impl = new UserServiceImpl();
         impl.createUsersTable();
 
