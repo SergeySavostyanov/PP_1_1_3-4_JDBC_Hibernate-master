@@ -36,13 +36,14 @@ public class UserDaoJDBCImpl implements UserDao {
             }
         }
 
+
     }
 
     public void dropUsersTable() {
         Connection connection = Util.getConnection();
         try (Statement statement = connection.createStatement()) {
             connection.setAutoCommit(false);
-            statement.executeUpdate("DROP TABLE users");
+            statement.executeUpdate("DROP TABLE IF EXISTS users");
             connection.commit();
             connection.close();
 
@@ -103,13 +104,19 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setId(set.getLong("id"));
                 users.add(user);
                 connection.commit();
-                connection.close();
+
             }
         } catch (SQLException e) {
             System.out.println("Ошибка при создании списка");
             try {
                 connection.rollback();
             } catch (SQLException ex) {
+            }
+        }finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
             }
         }
         return users;
